@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: web
+      args:
+        NODE_ENV: development
+        YARN_VERSION: berry
+    command: yarn start
+    ports:
+      - 3000:3000
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+
+  api:
+    build:
+      context: api
+      args:
+        NODE_ENV: development
+        YARN_VERSION: berry
+    command: yarn start:dev
+    environment:
+      - NODE_ENV=development
+    ports:
+      - 4000:80
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+      - /app/dist
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=library
+    ports:
+      - 5432:5432
